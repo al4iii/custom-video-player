@@ -8,48 +8,32 @@ const skipButtons = player.querySelectorAll('[data-skip]');
 const ranges = player.querySelectorAll('.player__slider');
 
 /* Build out functions */
-function togglePlay() {
-  const method = video.paused ? 'play' : 'pause';
-  video[method]();
-}
+let togglePlay = () => video[video.paused ? 'play' : 'pause']();
 
-function updateButton() {
-  const icon = this.paused ? '►' : '❚ ❚';
-  console.log(icon);
-  toggle.textContent = icon;
-}
+let updateButton = (event) => toggle.textContent = event.target.paused ? '►' : '❚ ❚';
 
-function skip() {
- video.currentTime += parseFloat(this.dataset.skip);
-}
+let scrub = (event) => video.currentTime = (event.offsetX / progress.offsetWidth) * video.duration;
 
-function handleRangeUpdate() {
-  video[this.name] = this.value;
-}
+let handleProgress= () => progressBar.style.flexBasis = `${(video.currentTime / video.duration) * 100}%`;
 
-function handleProgress() {
-  const percent = (video.currentTime / video.duration) * 100;
-  progressBar.style.flexBasis = `${percent}%`;
-}
+let skip = (event) => video.currentTime = video.currentTime + parseFloat(event.target.dataset.skip);
 
-function scrub(e) {
-  const scrubTime = (e.offsetX / progress.offsetWidth) * video.duration;
-  video.currentTime = scrubTime;
-}
+let handleRangeUpdate = (event) => video[event.target.name] = event.target.value;
 
 /* Hook up the event listeners */
 video.addEventListener('click', togglePlay);
 video.addEventListener('play', updateButton);
 video.addEventListener('pause', updateButton);
 video.addEventListener('timeupdate', handleProgress);
-
 toggle.addEventListener('click', togglePlay);
+
 skipButtons.forEach(button => button.addEventListener('click', skip));
 ranges.forEach(range => range.addEventListener('change', handleRangeUpdate));
 ranges.forEach(range => range.addEventListener('mousemove', handleRangeUpdate));
 
 let mousedown = false;
+
 progress.addEventListener('click', scrub);
-progress.addEventListener('mousemove', (e) => mousedown && scrub(e));
+progress.addEventListener('mousemove', e => mousedown && scrub(e));
 progress.addEventListener('mousedown', () => mousedown = true);
 progress.addEventListener('mouseup', () => mousedown = false);
